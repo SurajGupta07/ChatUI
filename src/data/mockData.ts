@@ -47,4 +47,13 @@ export const mockMessages: Message[] = [
     type: 'ai',
     hasFeedback: false,
   },
+  {
+    id: '7',
+    sender: 'ai_astrologer',
+    text: 'Hey! I have analyzed your details. Currently, you are running through Shani Mahadasha. This often brings pressure but builds resilience.',
+    timestamp: 1734681660000,
+    type: 'ai',
+    hasFeedback: true,
+    feedbackType: 'liked',
+  },
 ];

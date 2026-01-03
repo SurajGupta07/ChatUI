@@ -15,7 +15,7 @@ interface AIFeedbackProps {
 
 const AnimatedView = Animated.createAnimatedComponent(View);
 
-const AIFeedback: React.FC<AIFeedbackProps> = ({ message }) => {
+export const AIFeedback: React.FC<AIFeedbackProps> = ({ message }) => {
   const { updateMessageFeedback } = useChat();
   const [selectedChip, setSelectedChip] = useState<FeedbackChip | null>(
     message.feedbackChip || null,
@@ -156,5 +156,3 @@ const styles = StyleSheet.create({
     color: '#FFF',
   },
 });
-
-export default AIFeedback;

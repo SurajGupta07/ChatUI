@@ -66,6 +66,7 @@ export const ChatScreen: React.FC = () => {
       <FlatList
         ref={flatListRef}
         data={messages}
+        showsVerticalScrollIndicator={false}
         renderItem={renderMessage}
         keyExtractor={item => item.id}
         onContentSizeChange={() => {

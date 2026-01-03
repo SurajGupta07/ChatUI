@@ -1,97 +1,230 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# Chat UI - React Native Implementation
 
-# Getting Started
+A high-performance, interactive chat screen built with React Native New Architecture, featuring smooth animations, gesture handling, and micro-interactions.
 
-> **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
+## Features Implemented
 
-## Step 1: Start Metro
+### Part A: Interactive Message Actions
 
-First, you will need to run **Metro**, the JavaScript build tool for React Native.
+1. **Swipe-to-Reply**
 
-To start the Metro dev server, run the following command from the root of your React Native project:
+   - Swipe right on any message to reveal a Reply icon
+   - On release after threshold, message springs back and reply preview appears
+   - Reply preview shows above input with cancel option
+   - Uses Reanimated shared values and worklets
+   - Gesture logic runs on UI thread using `Gesture.Pan`
 
-```sh
-# Using npm
-npm start
+2. **Message Reactions (Long-Press)**
+   - Long-press any message to show emoji reaction bar (🙏 ✨ 🌙 💫 🌟)
+   - Emoji bar appears near the press location
+   - Selecting an emoji attaches it below the message bubble
+   - Smooth animations using Reanimated
 
-# OR using Yarn
-yarn start
+### Part B: AI Feedback & Session Flow
+
+1. **AI Dislike Feedback**
+
+   - Like/Dislike toggle for AI Astrologer messages
+   - On Dislike, feedback chips expand with animation:
+     - Inaccurate
+     - Too Vague
+     - Too Long
+   - Chip selection updates local state
+   - Smooth layout animations
+
+2. **Session Termination & Rating**
+   - "End Chat" button in header
+   - On press, shows full-screen overlay with:
+     - 5-star rating component
+     - "Thank You" message
+   - Layout animations for transitions
+   - Alert confirms rating data capture
+
+## Project Structure
+
+```
+src/
+├── components/
+│   ├── MessageBubble.tsx      # Main message component with swipe & long-press
+│   ├── AIFeedback.tsx         # Like/Dislike with expandable chips
+│   ├── ReplyPreview.tsx       # Reply preview above input
+│   └── RatingModal.tsx        # End chat rating modal
+├── screens/
+│   └── ChatScreen.tsx         # Main chat screen
+├── context/
+│   └── ChatContext.tsx        # State management with React Context
+├── types/
+│   └── index.ts               # TypeScript type definitions
+└── data/
+    └── mockData.ts            # Initial chat messages
 ```
 
-## Step 2: Build and run your app
+## Setup & Running
 
-With Metro running, open a new terminal window/pane from the root of your React Native project, and use one of the following commands to build and run your Android or iOS app:
+### Prerequisites
 
-### Android
+- Node.js = 20.19.4
+- React Native 0.83.0 (New Architecture)
+- iOS: Xcode and CocoaPods
+- Android: Android Studio
 
-```sh
-# Using npm
-npm run android
+### Installation
 
-# OR using Yarn
-yarn android
+1. Install dependencies:
+
+```bash
+npm install
 ```
 
-### iOS
+2. For iOS, install pods:
 
-For iOS, remember to install CocoaPods dependencies (this only needs to be run on first clone or after updating native deps).
-
-The first time you create a new project, run the Ruby bundler to install CocoaPods itself:
-
-```sh
-bundle install
+```bash
+cd ios && pod install && cd ..
 ```
 
-Then, and every time you update your native dependencies, run:
+3. Run the app:
 
-```sh
-bundle exec pod install
+**iOS:**
+
+```bash
+npx react-native run-ios
 ```
 
-For more information, please visit [CocoaPods Getting Started guide](https://guides.cocoapods.org/using/getting-started.html).
+**Android:**
 
-```sh
-# Using npm
-npm run ios
-
-# OR using Yarn
-yarn ios
+```bash
+npx react-native run-android
 ```
 
-If everything is set up correctly, you should see your new app running in the Android Emulator, iOS Simulator, or your connected device.
+## Technical Implementation Details
 
-This is one way to run your app — you can also build it directly from Android Studio or Xcode.
+### Reanimated Usage
 
-## Step 3: Modify your app
+- **Shared Values**: Used for all animated properties (`translateX`, `scale`, `opacity`)
+- **Worklets**: All gesture handlers run on UI thread using `'worklet'` directive
+- **Animations**:
+  - `withSpring()` for natural spring-back animations (swipe-to-reply)
+  - `withTiming()` for smooth transitions (emoji bar, feedback chips)
+  - `runOnJS()` to bridge UI thread worklets to JS thread for state updates
 
-Now that you have successfully run the app, let's make changes!
+**Key Example - Swipe-to-Reply:**
 
-Open `App.tsx` in your text editor of choice and make some changes. When you save, your app will automatically update and reflect these changes — this is powered by [Fast Refresh](https://reactnative.dev/docs/fast-refresh).
+```typescript
+const translateX = useSharedValue(0);
 
-When you want to forcefully reload, for example to reset the state of your app, you can perform a full reload:
+const panGesture = Gesture.Pan()
+  .onUpdate((e) => {
+    'worklet';
+    if (e.translationX > 0) {
+      translateX.value = Math.min(e.translationX, SWIPE_MAX);
+    }
+  })
+  .onEnd((e) => {
+    'worklet';
+    if (e.translationX > SWIPE_THRESHOLD) {
+      runOnJS(setReplyState)({...});
+      translateX.value = withSpring(0);
+    }
+  });
+```
 
-- **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Dev Menu**, accessed via <kbd>Ctrl</kbd> + <kbd>M</kbd> (Windows/Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (macOS).
-- **iOS**: Press <kbd>R</kbd> in iOS Simulator.
+### Gesture Handling Approach
 
-## Congratulations! :tada:
+- **React Native Gesture Handler**: Used for all touch interactions
+- **Gesture Composition**: `Gesture.Simultaneous()` allows swipe and long-press on same element
+- **UI Thread Execution**: All gesture callbacks run on UI thread for 60fps performance
+- **Gesture Types**:
+  - `Gesture.Pan()` for swipe-to-reply
+  - `Gesture.LongPress()` for emoji reactions
 
-You've successfully run and modified your React Native App. :partying_face:
+**Key Example - Combined Gestures:**
 
-### Now what?
+```typescript
+const panGesture = Gesture.Pan()...
+const longPressGesture = Gesture.LongPress()...
+const composedGesture = Gesture.Simultaneous(panGesture, longPressGesture);
+```
 
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [docs](https://reactnative.dev/docs/getting-started).
+### State Management Choice
 
-# Troubleshooting
+**React Context API** was chosen for this implementation because:
 
-If you're having issues getting the above steps to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
+1. **Simplicity**: No external dependencies, built into React
+2. **Performance**: Sufficient for chat UI with moderate message volume
+3. **Type Safety**: Full TypeScript support with proper typing
+4. **Real-time Updates**: Context provides reactive updates for all consumers
+5. **Scope**: Chat state is localized to the chat screen, perfect for Context
 
-# Learn More
+**Alternative Considerations:**
 
-To learn more about React Native, take a look at the following resources:
+- **Zustand**: Would be better for larger apps with multiple screens
+- **Redux**: Overkill for this single-screen chat interface
 
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+**State Structure:**
+
+```typescript
+interface ChatContextType {
+  messages: Message[];
+  replyState: ReplyState | null;
+  setReplyState: (reply: ReplyState | null) => void;
+  addMessage: (message: Omit<Message, 'id' | 'timestamp'>) => void;
+  updateMessageFeedback: (
+    messageId: string,
+    feedbackType: FeedbackType,
+    chip?: FeedbackChip,
+  ) => void;
+  addReaction: (messageId: string, emoji: string) => void;
+}
+```
+
+## Key Design Decisions
+
+1. **Swipe Direction**: Only right swipe for reply (prevents conflicts with scroll)
+2. **Emoji Bar Position**: Calculated dynamically based on press location
+3. **Feedback Chips**: Expand on dislike, collapse on like (clear UX)
+4. **Rating Modal**: Full-screen overlay for focus (better UX than bottom sheet)
+5. **Reply Preview**: Shows above input (standard chat pattern)
+
+## Testing the Features
+
+1. **Swipe-to-Reply**:
+
+   - Swipe right on any message
+   - Release after ~80px to trigger reply
+   - See reply preview above input
+
+2. **Long-Press Reactions**:
+
+   - Long-press any message for 300ms
+   - Emoji bar appears near press location
+   - Tap emoji to add/remove reaction
+
+3. **AI Feedback**:
+
+   - Tap Like/Dislike on AI messages
+   - On Dislike, chips expand with animation
+   - Select a chip to provide specific feedback
+
+4. **End Chat & Rating**:
+   - Tap "End Chat" in header
+   - Rate experience with 5 stars
+   - Submit to see confirmation alert
+
+## Notes
+
+- All animations are smooth and run at 60fps
+- Gesture handlers are optimized for UI thread execution
+- State management is simple but scalable
+- Code is modular and maintainable
+- TypeScript provides full type safety
+
+## Future Enhancements
+
+- Virtualized list for large message volumes
+- Message pagination/infinite scroll
+- Typing indicators
+- Message status (sent, delivered, read)
+- Image/file attachments
+- Voice messages
+
+---

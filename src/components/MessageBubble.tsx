@@ -16,7 +16,7 @@ import Animated, {
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { Message } from '../types';
 import { useChat } from '../context/ChatContext';
-import AIFeedback from './AIFeedback';
+import { AIFeedback } from './AIFeedback';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 const SWIPE_THRESHOLD = 80;
