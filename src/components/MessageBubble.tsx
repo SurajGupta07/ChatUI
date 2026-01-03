@@ -22,7 +22,7 @@ const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 const SWIPE_THRESHOLD = 80;
 const SWIPE_MAX = 100;
 const EMOJI_BAR_WIDTH = 250;
-const EMOJI_BAR_HEIGHT = 50;
+const EMOJI_BAR_HEIGHT = 60;
 const EMOJIS = ['🙏', '✨', '🌙', '💫', '🌟'];
 
 interface MessageBubbleProps {
