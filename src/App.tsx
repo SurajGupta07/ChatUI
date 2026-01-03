@@ -1,8 +1,8 @@
 import React from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { ChatProvider } from './src/context/ChatContext';
-import { ChatScreen } from './src/screens/ChatScreen';
+import { ChatProvider } from './context/ChatContext';
+import { ChatScreen } from './screens/ChatScreen';
 
 function App() {
   return (
