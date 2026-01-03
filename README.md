@@ -227,4 +227,8 @@ interface ChatContextType {
 - Image/file attachments
 - Voice messages
 
+## Preview Video
+https://github.com/user-attachments/assets/13617937-ec23-4835-b750-821d6c468c76
+
+
 ---
