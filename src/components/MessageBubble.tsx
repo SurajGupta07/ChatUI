@@ -11,8 +11,8 @@ import Animated, {
   useAnimatedStyle,
   withSpring,
   withTiming,
-  runOnJS,
 } from 'react-native-reanimated';
+import { scheduleOnRN } from 'react-native-worklets';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { Message } from '../types';
 import { useChat } from '../context/ChatContext';
@@ -66,7 +66,7 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
     .onEnd(e => {
       'worklet';
       if (e.translationX > SWIPE_THRESHOLD) {
-        runOnJS(setReplyState)({
+        scheduleOnRN(setReplyState, {
           messageId: message.id,
           messageText: message.text,
           sender: message.sender,
@@ -88,8 +88,8 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
       );
       const y = e.y - EMOJI_BAR_HEIGHT - 20;
 
-      runOnJS(setEmojiBarPosition)({ x, y });
-      runOnJS(setShowEmojiBar)(true);
+      scheduleOnRN(setEmojiBarPosition, { x, y });
+      scheduleOnRN(setShowEmojiBar, true);
     });
 
   const composedGesture = Gesture.Simultaneous(panGesture, longPressGesture);

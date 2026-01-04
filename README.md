@@ -105,7 +105,7 @@ npx react-native run-android
 - **Animations**:
   - `withSpring()` for natural spring-back animations (swipe-to-reply)
   - `withTiming()` for smooth transitions (emoji bar, feedback chips)
-  - `runOnJS()` to bridge UI thread worklets to JS thread for state updates
+  - `scheduleOnRN()` to bridge UI thread worklets to JS thread for state updates
 
 **Key Example - Swipe-to-Reply:**
 
@@ -122,7 +122,7 @@ const panGesture = Gesture.Pan()
   .onEnd((e) => {
     'worklet';
     if (e.translationX > SWIPE_THRESHOLD) {
-      runOnJS(setReplyState)({...});
+      scheduleOnRN(setReplyState, {...});
       translateX.value = withSpring(0);
     }
   });
@@ -228,7 +228,7 @@ interface ChatContextType {
 - Voice messages
 
 ## Preview Video
-https://github.com/user-attachments/assets/13617937-ec23-4835-b750-821d6c468c76
 
+https://github.com/user-attachments/assets/13617937-ec23-4835-b750-821d6c468c76
 
 ---
