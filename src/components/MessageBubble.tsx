@@ -137,25 +137,27 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
           <Animated.View style={[styles.replyIcon, replyIconStyle]}>
             <Text style={styles.replyIconText}>↩</Text>
           </Animated.View>
-          <View
-            style={[
-              styles.bubble,
-              isUser ? styles.userBubble : styles.otherBubble,
-            ]}
-          >
-            {replyToMessage && (
-              <View style={styles.replyPreview}>
-                <Text style={styles.replyPreviewSender}>
-                  {replyToMessage.sender === 'user' ? 'You' : 'Astrologer'}
-                </Text>
-                <Text style={styles.replyPreviewText} numberOfLines={1}>
-                  {replyToMessage.text}
-                </Text>
-              </View>
-            )}
-            <Text style={[styles.text, isUser && styles.userText]}>
-              {message.text}
-            </Text>
+          <View style={styles.shrink}>
+            <View
+              style={[
+                styles.bubble,
+                isUser ? styles.userBubble : styles.otherBubble,
+              ]}
+            >
+              {replyToMessage && (
+                <View style={styles.replyPreview}>
+                  <Text style={styles.replyPreviewSender}>
+                    {replyToMessage.sender === 'user' ? 'You' : 'Astrologer'}
+                  </Text>
+                  <Text style={styles.replyPreviewText} numberOfLines={1}>
+                    {replyToMessage.text}
+                  </Text>
+                </View>
+              )}
+              <Text style={[styles.text, isUser && styles.userText]}>
+                {message.text}
+              </Text>
+            </View>
             {message.reactions && message.reactions.length > 0 && (
               <View style={styles.reactionsContainer}>
                 {message.reactions.map((emoji, index) => (
@@ -233,8 +235,10 @@ const styles = StyleSheet.create({
   bubble: {
     padding: 12,
     borderRadius: 16,
-    flexShrink: 1,
     minWidth: 0,
+  },
+  shrink: {
+    flexShrink: 1,
   },
   userBubble: {
     backgroundColor: '#007AFF',
@@ -282,7 +286,11 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   reactionEmoji: {
-    fontSize: 16,
+    backgroundColor: '#EFF8FF',
+    borderRadius: 100,
+    padding: 4,
+    marginTop: -16,
+    fontSize: 12,
   },
   backdrop: {
     position: 'absolute',
